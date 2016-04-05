@@ -17,6 +17,7 @@ public enum MicropolisTool
 	BULLDOZER(1, 1),
 	WIRE(1, 5),   //cost=25 for underwater
 	ROADS(1, 10), //cost=50 for over water
+	BIKELANES(1, 10), //cost=50 for over water
 	RAIL(1, 20),  //cost=100 for underwater
 	RESIDENTIAL(3, 100),
 	COMMERCIAL(3, 100),
@@ -59,6 +60,7 @@ public enum MicropolisTool
 		case WIRE:
 		case ROADS:
 		case RAIL:
+		case BIKELANES:
 			return new RoadLikeTool(engine, this, xpos, ypos);
 
 		case FIRE:

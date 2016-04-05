@@ -1012,6 +1012,11 @@ public class MainWindow extends JFrame
 		b1.add(makeToolBtn(MicropolisTool.RAIL));
 
 		c.gridy++;
+		Box b1b = new Box(BoxLayout.X_AXIS);
+		gridBox.add(b1b,c);
+		b1b.add(makeToolBtn(MicropolisTool.BIKELANES));
+		
+		c.gridy++;
 		Box b2 = new Box(BoxLayout.X_AXIS);
 		gridBox.add(b2,c);
 

@@ -74,6 +74,28 @@ public class TileConstants
 	static final char HROADPOWER = 77;
 	static final char VROADPOWER = 78;
 	static final char BRWH = 79;       //horz bridge, open
+	
+	static final char BIKEBASE = 960;
+	static final char BIKEHBRIDGE = 960;
+	static final char BIKEVBRIDGE = 961;
+	static final char BIKES = 962;
+	static final char BIKES2 = 963;
+	private static final char BIKES3 = 964;
+	private static final char BIKES4 = 965;
+	private static final char BIKES5 = 966;
+	private static final char BIKES6 = 967;
+	private static final char BIKES7 = 968;
+	private static final char BIKES8 = 969;
+	private static final char BIKES9 = 970;
+	private static final char BIKES10 = 971;
+	static final char BIKEINTERSECTION = 972;
+	static final char HBIKEPOWER = 973;
+	static final char VBIKEPOWER = 974;
+	static final char BIKEBRWH = 975;       //bike horz bridge, open
+	static final char BIKELTRFBASE = 976;
+	static final char BIKEBRWV = 991;       //bike vert bridge, open
+	static final char LASTBIKE = 1022;
+	
 	static final char LTRFBASE = 80;
 	static final char BRWV = 95;       //vert bridge, open
 	static final char HTRFBASE = 144;
@@ -159,6 +181,13 @@ public class TileConstants
 		ROADS5, ROADS10, ROADS9, INTERSECTION
 		};
 
+	static final char [] BikeTable = new char[] {
+			BIKES, BIKES2, BIKES, BIKES3,
+			BIKES2, BIKES2, BIKES4, BIKES8,
+			BIKES, BIKES6, BIKES, BIKES7,
+			BIKES5, BIKES10, BIKES9, BIKEINTERSECTION
+			};
+	
 	static final char [] RailTable = new char[] {
 		LHRAIL, LVRAIL, LHRAIL, LVRAIL2,
 		LVRAIL, LVRAIL, LVRAIL3, LVRAIL7,
@@ -273,12 +302,12 @@ public class TileConstants
 			);
 	}
 
-	//used by Sprite::destroyTile
 	public static boolean isBridge(int tile)
 	{
 		return isRoad(tile) && !isCombustible(tile);
 	}
 
+	//used by Sprite::destroyTile
 	public static boolean isCombustible(int tile)
 	{
 		assert (tile & LOMASK) == tile;
@@ -411,6 +440,13 @@ public class TileConstants
 		return (tile >= ROADBASE && tile < POWERBASE);
 	}
 
+	public static boolean isBike(int tile)
+	{
+		assert (tile & LOMASK) == tile;
+
+		return (tile >= BIKEBASE && tile <= LASTBIKE);
+	}
+	
 	public static boolean isRoadAny(int tile)
 	{
 		assert (tile & LOMASK) == tile;
@@ -427,51 +463,59 @@ public class TileConstants
 	public static boolean isRoadDynamic(int tile)
 	{
 		int tmp = neutralizeRoad(tile);
-		return (tmp >= ROADS && tmp <= INTERSECTION);
+		return (tmp >= ROADS && tmp <= INTERSECTION) || (tmp >= BIKES && tmp <= BIKEINTERSECTION);
 	}
 
 	public static boolean roadConnectsEast(int tile)
 	{
 		tile = neutralizeRoad(tile);
-		return (((tile == VRAILROAD) ||
-			(tile >= ROADBASE && tile <= VROADPOWER)
-			) &&
-			(tile != VROADPOWER) &&
-			(tile != HRAILROAD) &&
-			(tile != VBRIDGE));
+		return (
+				((tile == VRAILROAD) || (tile >= ROADBASE && tile <= VROADPOWER) || (tile >= BIKEBASE && tile <= VBIKEPOWER)) &&
+				(tile != VROADPOWER) &&
+				(tile != VBIKEPOWER) &&
+				(tile != HRAILROAD) &&
+				(tile != VBRIDGE) &&
+				(tile != BIKEVBRIDGE)
+			);
 	}
 
 	public static boolean roadConnectsNorth(int tile)
 	{
 		tile = neutralizeRoad(tile);
-		return (((tile == HRAILROAD) ||
-			(tile >= ROADBASE && tile <= VROADPOWER)
-			) &&
+		return (
+				((tile == HRAILROAD) || (tile >= ROADBASE && tile <= VROADPOWER) || (tile >= BIKEBASE && tile <= VBIKEPOWER)) &&
 			(tile != HROADPOWER) &&
+			(tile != HBIKEPOWER) &&
 			(tile != VRAILROAD) &&
-			(tile != ROADBASE));
+			(tile != ROADBASE) &&
+			(tile != BIKEBASE)
+			);
 	}
 
 	public static boolean roadConnectsSouth(int tile)
 	{
 		tile = neutralizeRoad(tile);
-		return (((tile == HRAILROAD) ||
-			(tile >= ROADBASE && tile <= VROADPOWER)
-			) &&
+		return (
+				((tile == HRAILROAD) || (tile >= ROADBASE && tile <= VROADPOWER) || (tile >= BIKEBASE && tile <= VBIKEPOWER)) &&
 			(tile != HROADPOWER) &&
+			(tile != HBIKEPOWER) &&
 			(tile != VRAILROAD) &&
-			(tile != ROADBASE));
+			(tile != ROADBASE) &&
+			(tile != BIKEBASE)
+			);
 	}
 
 	public static boolean roadConnectsWest(int tile)
 	{
 		tile = neutralizeRoad(tile);
-		return (((tile == VRAILROAD) ||
-			(tile >= ROADBASE && tile <= VROADPOWER)	
-			) &&
-			(tile != VROADPOWER) &&
-			(tile != HRAILROAD) &&
-			(tile != VBRIDGE));
+		return (
+				((tile == VRAILROAD) || (tile >= ROADBASE && tile <= VROADPOWER) || (tile >= BIKEBASE && tile <= VBIKEPOWER)) &&
+				(tile != VROADPOWER) &&
+				(tile != VBIKEPOWER) &&
+				(tile != HRAILROAD) &&
+				(tile != VBRIDGE) &&
+				(tile != BIKEVBRIDGE)
+			);
 	}
 
 	public static boolean isRail(int tile)
@@ -676,6 +720,9 @@ public class TileConstants
 
 		if (tile >= ROADBASE && tile <= LASTROAD) {
 			tile = ((tile - ROADBASE) & 0xf) + ROADBASE;
+		}
+		else if (tile >= BIKEBASE && tile <= LASTBIKE) {
+			tile = ((tile - BIKEBASE) & 0xf) + BIKEBASE;
 		}
 		return (char)tile;
 	}

@@ -97,6 +97,9 @@ class RoadLikeTool extends ToolStroke
 		case ROADS:
 			return applyRoadTool(eff);
 
+		case BIKELANES:
+			return applyBikeLaneTool(eff);
+			
 		case WIRE:
 			return applyWireTool(eff);
 
@@ -118,7 +121,18 @@ class RoadLikeTool extends ToolStroke
 
 	boolean applyRoadTool(ToolEffectIfc eff)
 	{
-		if (layRoad(eff)) {
+		if (layRoad(eff, false)) {
+			fixZone(eff);
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	
+	boolean applyBikeLaneTool(ToolEffectIfc eff)
+	{
+		if (layRoad(eff, true)) {
 			fixZone(eff);
 			return true;
 		}
@@ -243,7 +257,7 @@ class RoadLikeTool extends ToolStroke
 		return true;
 	}
 
-	private boolean layRoad(ToolEffectIfc eff)
+	private boolean layRoad(ToolEffectIfc eff, boolean isBike)
 	{
 		final int ROAD_COST = 10;
 		final int BRIDGE_COST = 50;
@@ -264,9 +278,16 @@ class RoadLikeTool extends ToolStroke
 				char eTile = neutralizeRoad(eff.getTile(1, 0));
 				if (eTile == VRAILROAD ||
 					eTile == HBRIDGE ||
-					(eTile >= TileConstants.ROADS && eTile <= HROADPOWER))
+					eTile == BIKEHBRIDGE ||
+					(eTile >= TileConstants.ROADS && eTile <= HROADPOWER) ||
+					(eTile >= TileConstants.BIKES && eTile <= HBIKEPOWER))
 				{
-					eff.setTile(0, 0, HBRIDGE);
+					if (isBike) {
+						eff.setTile(0, 0, BIKEHBRIDGE);
+					}
+					else {
+						eff.setTile(0, 0, HBRIDGE);
+					}
 					break;
 				}
 			}
@@ -276,9 +297,16 @@ class RoadLikeTool extends ToolStroke
 				char wTile = neutralizeRoad(eff.getTile(-1, 0));
 				if (wTile == VRAILROAD ||
 					wTile == HBRIDGE ||
-					(wTile >= TileConstants.ROADS && wTile <= INTERSECTION))
+					wTile == BIKEHBRIDGE ||
+					(wTile >= TileConstants.ROADS && wTile <= INTERSECTION) ||
+					(wTile >= TileConstants.BIKES && wTile <= BIKEINTERSECTION))
 				{
-					eff.setTile(0, 0, HBRIDGE);
+					if (isBike) {
+						eff.setTile(0, 0, BIKEHBRIDGE);
+					}
+					else {
+						eff.setTile(0, 0, HBRIDGE);
+					}
 					break;
 				}
 			}
@@ -288,9 +316,16 @@ class RoadLikeTool extends ToolStroke
 				char sTile = neutralizeRoad(eff.getTile(0, 1));
 				if (sTile == HRAILROAD ||
 					sTile == VROADPOWER ||
-					(sTile >= VBRIDGE && sTile <= INTERSECTION))
+					sTile == VBIKEPOWER ||
+					(sTile >= VBRIDGE && sTile <= INTERSECTION) ||
+					(sTile >= BIKEVBRIDGE && sTile <= BIKEINTERSECTION))
 				{
-					eff.setTile(0, 0, VBRIDGE);
+					if (isBike) {
+						eff.setTile(0, 0, BIKEVBRIDGE);
+					}
+					else {
+						eff.setTile(0, 0, VBRIDGE);
+					}
 					break;
 				}
 			}
@@ -300,9 +335,16 @@ class RoadLikeTool extends ToolStroke
 				char nTile = neutralizeRoad(eff.getTile(0, -1));
 				if (nTile == HRAILROAD ||
 					nTile == VROADPOWER ||
-					(nTile >= VBRIDGE && nTile <= INTERSECTION))
+					nTile == VBIKEPOWER ||
+					(nTile >= VBRIDGE && nTile <= INTERSECTION) ||
+					(nTile >= BIKEVBRIDGE && nTile <= BIKEINTERSECTION))
 				{
-					eff.setTile(0, 0, VBRIDGE);
+					if (isBike) {
+						eff.setTile(0, 0, BIKEVBRIDGE);
+					}
+					else {
+						eff.setTile(0, 0, VBRIDGE);
+					}
 					break;
 				}
 			}
@@ -311,11 +353,21 @@ class RoadLikeTool extends ToolStroke
 			return false;
 
 		case LHPOWER: //road on power
-			eff.setTile(0, 0, VROADPOWER);
+			if (isBike) {
+				eff.setTile(0, 0, VBIKEPOWER);
+			}
+			else {
+				eff.setTile(0, 0, VROADPOWER);
+			}
 			break;
 
 		case LVPOWER: //road on power #2
-			eff.setTile(0, 0, HROADPOWER);
+			if (isBike) {
+				eff.setTile(0, 0, HBIKEPOWER);
+			}
+			else {
+				eff.setTile(0, 0, HROADPOWER);
+			}
 			break;
 
 		case LHRAIL: //road on rail
@@ -339,7 +391,12 @@ class RoadLikeTool extends ToolStroke
 
 			// road on dirt;
 			// just build a plain road, fixZone will fix it.
-			eff.setTile(0, 0, TileConstants.ROADS);
+			if (isBike) {
+				eff.setTile(0, 0, TileConstants.BIKES);
+			}
+			else {
+				eff.setTile(0, 0, TileConstants.ROADS);
+			}
 			break;
 		}
 	
@@ -372,6 +429,7 @@ class RoadLikeTool extends ToolStroke
 
 				if (isConductive(tmp) &&
 					tmpn != HROADPOWER &&
+					tmpn != HBIKEPOWER &&
 					tmpn != RAILHPOWERV &&
 					tmpn != HPOWER)
 				{
@@ -387,6 +445,7 @@ class RoadLikeTool extends ToolStroke
 
 				if (isConductive(tmp) &&
 					tmpn != HROADPOWER &&
+					tmpn != HBIKEPOWER &&
 					tmpn != RAILHPOWERV &&
 					tmpn != HPOWER)
 				{
@@ -402,6 +461,7 @@ class RoadLikeTool extends ToolStroke
 
 				if (isConductive(tmp) &&
 					tmpn != VROADPOWER &&
+					tmpn != VBIKEPOWER &&
 					tmpn != RAILVPOWERH &&
 					tmpn != VPOWER)
 				{
@@ -417,6 +477,7 @@ class RoadLikeTool extends ToolStroke
 
 				if (isConductive(tmp) &&
 					tmpn != VROADPOWER &&
+					tmpn != VBIKEPOWER &&
 					tmpn != RAILVPOWERH &&
 					tmpn != VPOWER)
 				{
@@ -435,7 +496,13 @@ class RoadLikeTool extends ToolStroke
 		case ROADS2: // wire on N/S road
 			eff.setTile(0, 0, VROADPOWER);
 			break;
+		case TileConstants.BIKES: // wire on E/W road
+			eff.setTile(0, 0, HBIKEPOWER);
+			break;
 
+		case BIKES2: // wire on N/S road
+			eff.setTile(0, 0, VBIKEPOWER);
+			break;
 		case LHRAIL:	// wire on E/W railroad tracks
 			eff.setTile(0, 0, RAILHPOWERV);
 			break;

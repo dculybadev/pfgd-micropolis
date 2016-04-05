@@ -415,8 +415,13 @@ public class OverlayMapView extends JComponent
 		{
 			for (int xx = 0; xx < TILE_WIDTH; xx++)
 			{
+				try {
 				img.setRGB(x*TILE_WIDTH+xx,y*TILE_HEIGHT+yy,
 					tileArrayImage.getRGB(xx,tile*TILE_OFFSET_Y+yy));
+				}
+				catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 		}
 	}

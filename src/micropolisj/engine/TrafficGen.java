@@ -25,6 +25,7 @@ class TrafficGen
 	Stack<CityLocation> positions = new Stack<CityLocation>();
 
 	static final int MAX_TRAFFIC_DISTANCE = 30;
+	static final int MAX_BIKE_DISTANCE = 12;
 
 	public TrafficGen(Micropolis city)
 	{
@@ -62,7 +63,7 @@ class TrafficGen
 
 			// check for road/rail
 			int tile = city.getTile(mapX, mapY);
-			if (tile >= ROADBASE && tile < POWERBASE)
+			if ((tile >= ROADBASE && tile < POWERBASE) || (tile >=BIKEBASE && tile <= LASTBIKE))
 			{
 				city.addTraffic(mapX, mapY, 50);
 			}
@@ -98,14 +99,31 @@ class TrafficGen
 
 		if (c < ROADBASE)
 			return false;
-		else if (c > LASTRAIL)
-			return false;
-		else if (c >= POWERBASE && c < LASTPOWER)
+		else if (c > LASTRAIL) {
+			if (c < BIKEBASE)
+				return false;
+			if (c > LASTBIKE)
+				return false;
+			else
+				return true;
+		}
+		else if (c >= POWERBASE && c < LASTPOWER) 
 			return false;
 		else
 			return true;
 	}
 
+	int bikeCount() {
+		int count = 0;
+		for (int i=0; i<positions.size(); i++) {
+			char c = city.getTile(positions.get(i).x, positions.get(i).y);
+			if (c >= BIKEBASE && c <= LASTBIKE) {
+				count++;
+			}
+		}
+		return count;
+	}
+	
 	boolean tryDrive()
 	{
 		lastdir = 5;
@@ -115,6 +133,11 @@ class TrafficGen
 		{
 			if (tryGo(z))
 			{
+				//Check to see if we've exceeded the biking load. If so, cancel out
+				int bikeCount = bikeCount();
+				if (bikeCount > MAX_BIKE_DISTANCE) {
+					return false;
+				}
 				// got a road
 				if (driveDone())
 				{

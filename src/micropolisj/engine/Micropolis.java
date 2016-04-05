@@ -1453,6 +1453,7 @@ public class Micropolis
 		bb.put("FLOOD", new TerrainBehavior(this, TerrainBehavior.B.FLOOD));
 		bb.put("RADIOACTIVE", new TerrainBehavior(this, TerrainBehavior.B.RADIOACTIVE));
 		bb.put("ROAD", new TerrainBehavior(this, TerrainBehavior.B.ROAD));
+		bb.put("BIKELANE", new TerrainBehavior(this, TerrainBehavior.B.BIKELANE));
 		bb.put("RAIL", new TerrainBehavior(this, TerrainBehavior.B.RAIL));
 		bb.put("EXPLOSION", new TerrainBehavior(this, TerrainBehavior.B.EXPLOSION));
 		bb.put("RESIDENTIAL", new MapScanner(this, MapScanner.B.RESIDENTIAL));

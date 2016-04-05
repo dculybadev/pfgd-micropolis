@@ -283,7 +283,12 @@ public class ToolStroke
 				adjTile |= 8;
 			}
 
-			eff.setTile(0, 0, RoadTable[adjTile]);
+			if (isBike(tile)) {
+				eff.setTile(0, 0, BikeTable[adjTile]);
+			}
+			else {
+				eff.setTile(0, 0, RoadTable[adjTile]);
+			}
 		} //endif on a road tile
 
 		else if (isRailDynamic(tile))

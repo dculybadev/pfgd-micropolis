@@ -27,6 +27,7 @@ class TerrainBehavior extends TileBehavior
 		RADIOACTIVE,
 		ROAD,
 		RAIL,
+		BIKELANE,
 		EXPLOSION;
 	}
 
@@ -44,6 +45,9 @@ class TerrainBehavior extends TileBehavior
 			doRadioactiveTile();
 			return;
 		case ROAD:
+			doRoad();
+			return;
+		case BIKELANE:
 			doRoad();
 			return;
 		case RAIL:
@@ -151,14 +155,15 @@ class TerrainBehavior extends TileBehavior
 	}
 
 	static int [] TRAFFIC_DENSITY_TAB = { ROADBASE, LTRFBASE, HTRFBASE };
-
+	static int [] BIKE_TRAFFIC_DENSITY_TAB = { BIKEBASE, BIKELTRFBASE };
+	
 	/**
 	 * Called when the current tile is a road tile.
 	 */
 	void doRoad()
 	{
 		city.roadTotal++;
-
+		boolean isBike = isBike(tile);
 		if (city.roadEffect < 30)
 		{
 			// deteriorating roads
@@ -185,14 +190,25 @@ class TerrainBehavior extends TileBehavior
 				return;
 		}
 
+		
 		int tden;
-		if (tile < LTRFBASE)
-			tden = 0;
-		else if (tile < HTRFBASE)
-			tden = 1;
+		
+		if (isBike) {
+			if (tile < BIKELTRFBASE)
+				tden = 0;
+			else {
+				tden = 1;
+			}
+		}
 		else {
-			city.roadTotal++;
-			tden = 2;
+			if (tile < LTRFBASE)
+				tden = 0;
+			else if (tile < HTRFBASE)
+				tden = 1;
+			else {
+				city.roadTotal++;
+				tden = 2;
+			}
 		}
 
 		int trafficDensity = city.getTrafficDensity(xpos, ypos);
@@ -203,7 +219,16 @@ class TerrainBehavior extends TileBehavior
 
 		if (tden != newLevel)
 		{
-			int z = ((tile - ROADBASE) & 15) + TRAFFIC_DENSITY_TAB[newLevel];
+			int z;
+			if (isBike) {
+				if (newLevel >= BIKE_TRAFFIC_DENSITY_TAB.length) {
+					newLevel = BIKE_TRAFFIC_DENSITY_TAB.length - 1;
+				}
+				z = ((tile - BIKEBASE) & 15) + BIKE_TRAFFIC_DENSITY_TAB[newLevel];
+			}
+			else {
+				z = ((tile - ROADBASE) & 15) + TRAFFIC_DENSITY_TAB[newLevel];
+			}
 			city.setTile(xpos, ypos, (char) z);
 		}
 	}
